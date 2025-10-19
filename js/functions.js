@@ -1,3 +1,15 @@
+function isMeetingWithinWorkday(workStart, workEnd, meetingStart, durationMinutes) {
+  function toMinutes(time) {
+    const [hours, minutes] = time.split(':').map(Number);
+    return hours * 60 + minutes;
+  }
+  const workStartInMinutes = toMinutes(workStart);
+  const workEndInMinutes = toMinutes(workEnd);
+  const meetingStartInMinutes = toMinutes(meetingStart);
+  const meetingEndInMinutes = meetingStartInMinutes + durationMinutes;
+  return meetingStartInMinutes >= workStartInMinutes && meetingEndInMinutes <= workEndInMinutes;
+}
+
 //Функция проверки максимальной длины
 const maxLength = (string, maxL) => {
   return string.length <= maxL;
@@ -29,6 +41,3 @@ function extractDigits(input) {
   }
   return result ? parseInt(result, 10) : NaN;
 }
-console.log(extractDigits('2023'))
-console.log(extractDigits('2023 год'))
-console.log(extractDigits('2023.5'))
