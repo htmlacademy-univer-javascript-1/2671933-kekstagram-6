@@ -1,7 +1,8 @@
+import { openBigPicture } from './big-picture.js';
+
 const picturesContainer = document.querySelector('.pictures');
 const pictureTemplate = document.querySelector('#picture').content.querySelector('.picture');
 
-// функция отрисовки одного фото
 function createPictureElement(photo) {
   const pictureElement = pictureTemplate.cloneNode(true);
 
@@ -14,10 +15,18 @@ function createPictureElement(photo) {
   likes.textContent = photo.likes;
   comments.textContent = photo.comments.length;
 
+  // привязываем данные
+  pictureElement.dataset.photoId = photo.id;
+
+  // обработчик клика по миниатюре
+  pictureElement.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    openBigPicture(photo);
+  });
+
   return pictureElement;
 }
 
-// основная функция отрисовки списка
 export function renderPictures(photos) {
   const fragment = document.createDocumentFragment();
 
