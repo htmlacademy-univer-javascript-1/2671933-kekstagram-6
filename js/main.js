@@ -1,11 +1,21 @@
 import './form.js';
 import { initScale } from './scale.js';
 import { initEffects } from './effects.js';
-import { generatePhotos } from './generate.js';
 import { renderPictures } from './pictures.js';
+import { load } from './api.js';
+import { showLoadError } from './messages.js';
 
 initScale();
 initEffects();
 
-const photoDescriptions = generatePhotos();
-renderPictures(photoDescriptions);
+load(
+  (photos) => {
+    renderPictures(photos);                 // рисуем миниатюры с сервера
+    document
+      .querySelector('.img-filters')
+      .classList.remove('img-filters--inactive'); // показать фильтры
+  },
+  (errorMessage) => {
+    showLoadError(errorMessage);            // сообщение об ошибке загрузки
+  }
+);

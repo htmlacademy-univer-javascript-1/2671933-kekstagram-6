@@ -1,3 +1,8 @@
+import { send } from './api.js';
+import { resetEffects } from './effects.js';
+import { showSuccess, showError } from './messages.js';
+
+
 const form = document.querySelector('.img-upload__form');
 const fileInput = form.querySelector('.img-upload__input');
 const overlay = form.querySelector('.img-upload__overlay');
@@ -17,16 +22,30 @@ function openUploadOverlay() {
 
 function resetForm() {
   form.reset();
-  // очистка fileInput, чтобы повторный выбор того же файла сработал
   fileInput.value = '';
+  resetEffects();
 }
 
-function closeUploadOverlay() {
+export function closeUploadOverlay() {
   overlay.classList.add('hidden');
   body.classList.remove('modal-open');
   document.removeEventListener('keydown', onDocumentKeydown);
   resetForm();
 }
+
+const submitButton = form.querySelector('.img-upload__submit');
+
+function blockSubmitButton() {
+  submitButton.disabled = true;
+  submitButton.textContent = 'Публикую...';
+}
+
+function unblockSubmitButton() {
+  submitButton.disabled = false;
+  submitButton.textContent = 'Опубликовать';
+}
+
+
 
 function isTextFieldFocused() {
   return document.activeElement === hashtagsField || document.activeElement === commentField;
@@ -151,8 +170,28 @@ pristine.addValidator(
 
 
 form.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+
   const isValid = pristine.validate();
   if (!isValid) {
-    evt.preventDefault();
+    return;
   }
+
+  blockSubmitButton();
+
+  const formData = new FormData(form);
+
+  send(
+    formData,
+    () => {
+      unblockSubmitButton();
+      closeUploadOverlay();
+      showSuccess();        // сообщение #success
+    },
+    () => {
+      unblockSubmitButton();
+      showError();          // сообщение #error
+    }
+  );
 });
+

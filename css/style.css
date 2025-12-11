@@ -1395,3 +1395,7 @@ main {
 .hidden {
   display: none;
 }
+
+.effect-level__slider {
+  margin-top: 2px;
+}
