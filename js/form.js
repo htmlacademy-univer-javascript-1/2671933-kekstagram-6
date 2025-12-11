@@ -2,7 +2,6 @@ import { send } from './api.js';
 import { resetEffects } from './effects.js';
 import { showSuccess, showError } from './messages.js';
 
-
 const form = document.querySelector('.img-upload__form');
 const fileInput = form.querySelector('.img-upload__input');
 const overlay = form.querySelector('.img-upload__overlay');
@@ -11,6 +10,11 @@ const body = document.body;
 
 const hashtagsField = form.querySelector('.text__hashtags');
 const commentField = form.querySelector('.text__description');
+
+// элементы превью
+const previewImage = document.querySelector('.img-upload__preview img');
+const effectsPreviews = document.querySelectorAll('.effects__preview');
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
 
 // Открытие / закрытие
 
@@ -45,7 +49,6 @@ function unblockSubmitButton() {
   submitButton.textContent = 'Опубликовать';
 }
 
-
 function isTextFieldFocused() {
   return document.activeElement === hashtagsField || document.activeElement === commentField;
 }
@@ -53,7 +56,6 @@ function isTextFieldFocused() {
 function onDocumentKeydown(evt) {
   if (evt.key === 'Escape') {
     if (isTextFieldFocused()) {
-      // не закрываем форму, если фокус в поле хэштегов или комментария
       evt.stopPropagation();
       return;
     }
@@ -62,11 +64,34 @@ function onDocumentKeydown(evt) {
   }
 }
 
-// Событие выбора файла
+// Событие выбора файла + загрузка превью
 fileInput.addEventListener('change', () => {
-  if (fileInput.files.length > 0) {
-    openUploadOverlay();
+  const file = fileInput.files[0];
+
+  if (!file) {
+    return;
   }
+
+  const fileName = file.name.toLowerCase();
+  const matches = FILE_TYPES.some((ext) => fileName.endsWith(ext));
+
+  if (!matches) {
+    // можно показать сообщение об ошибке формата, если требуется
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.addEventListener('load', () => {
+    const dataUrl = reader.result;
+    previewImage.src = dataUrl;
+    effectsPreviews.forEach((preview) => {
+      preview.style.backgroundImage = `url(${dataUrl})`;
+    });
+  });
+
+  reader.readAsDataURL(file);
+  openUploadOverlay();
 });
 
 // Закрытие по крестику
@@ -74,7 +99,6 @@ cancelButton.addEventListener('click', (evt) => {
   evt.preventDefault();
   closeUploadOverlay();
 });
-
 
 // Настройка Pristine
 const pristine = new Pristine(form, {
@@ -96,11 +120,11 @@ function parseHashtags(value) {
 }
 
 const HASHTAG_MAX_COUNT = 5;
-const HASHTAG_REGEXP = /^#[a-zа-яё0-9]{1,19}$/i; // # + 1–19 букв/цифр
+const HASHTAG_REGEXP = /^#[a-zа-яё0-9]{1,19}$/i;
 
 function validateHashtagFormat(value) {
   if (!value.trim()) {
-    return true; // хэштеги необязательны
+    return true;
   }
 
   const tags = parseHashtags(value);
@@ -167,7 +191,6 @@ pristine.addValidator(
   getCommentErrorMessage
 );
 
-
 form.addEventListener('submit', (evt) => {
   evt.preventDefault();
 
@@ -185,12 +208,11 @@ form.addEventListener('submit', (evt) => {
     () => {
       unblockSubmitButton();
       closeUploadOverlay();
-      showSuccess();        // сообщение #success
+      showSuccess();
     },
     () => {
       unblockSubmitButton();
-      showError();          // сообщение #error
+      showError();
     }
   );
 });
-
