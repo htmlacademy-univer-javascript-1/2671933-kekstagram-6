@@ -5,12 +5,6 @@ function appendMessage(element) {
   document.body.appendChild(element);
 }
 
-function onEscKeydown(evt, close) {
-  if (evt.key === 'Escape') {
-    evt.preventDefault();
-    close();
-  }
-}
 
 // универсальная функция навешивания обработчиков и закрытия
 function setupMessage(messageElement, buttonSelector, closeCallback) {
