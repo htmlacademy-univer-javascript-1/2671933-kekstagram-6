@@ -14,11 +14,21 @@ function onEscKeydown(evt, close) {
 
 // универсальная функция навешивания обработчиков и закрытия
 function setupMessage(messageElement, buttonSelector, closeCallback) {
-  const inner = messageElement.querySelector('div'); // .success__inner или .error__inner
+  const inner = messageElement.querySelector('div');
   const button = messageElement.querySelector(buttonSelector);
 
-  let onKeydown;
-  let onOuterClick;
+  const onKeydown = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      close();
+    }
+  };
+
+  const onOuterClick = (evt) => {
+    if (!inner.contains(evt.target)) {
+      close();
+    }
+  };
 
   function close() {
     messageElement.remove();
@@ -28,15 +38,6 @@ function setupMessage(messageElement, buttonSelector, closeCallback) {
       closeCallback();
     }
   }
-
-  onKeydown = (evt) => onEscKeydown(evt, close);
-
-  onOuterClick = (evt) => {
-    // клик по фону, а не по inner
-    if (!inner.contains(evt.target)) {
-      close();
-    }
-  };
 
   button.addEventListener('click', (evt) => {
     evt.preventDefault();
