@@ -17,18 +17,21 @@ function setupMessage(messageElement, buttonSelector, closeCallback) {
   const inner = messageElement.querySelector('div'); // .success__inner или .error__inner
   const button = messageElement.querySelector(buttonSelector);
 
-  const close = () => {
+  let onKeydown;
+  let onOuterClick;
+
+  function close() {
     messageElement.remove();
     document.removeEventListener('keydown', onKeydown);
     messageElement.removeEventListener('click', onOuterClick);
     if (closeCallback) {
       closeCallback();
     }
-  };
+  }
 
-  const onKeydown = (evt) => onEscKeydown(evt, close);
+  onKeydown = (evt) => onEscKeydown(evt, close);
 
-  const onOuterClick = (evt) => {
+  onOuterClick = (evt) => {
     // клик по фону, а не по inner
     if (!inner.contains(evt.target)) {
       close();
@@ -56,7 +59,6 @@ export function showError() {
   setupMessage(errorElement, '.error__button');
 }
 
-// Опционально: отдельное сообщение про ошибку загрузки миниатюр
 export function showLoadError(message) {
   const container = document.createElement('div');
   container.style.position = 'fixed';
