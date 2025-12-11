@@ -46,7 +46,6 @@ function unblockSubmitButton() {
 }
 
 
-
 function isTextFieldFocused() {
   return document.activeElement === hashtagsField || document.activeElement === commentField;
 }

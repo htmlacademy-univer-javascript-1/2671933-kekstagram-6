@@ -5,35 +5,33 @@ function appendMessage(element) {
   document.body.appendChild(element);
 }
 
-function onEscKeydown(evt, close) {
-  if (evt.key === 'Escape') {
-    evt.preventDefault();
-    close();
-  }
-}
 
 // универсальная функция навешивания обработчиков и закрытия
 function setupMessage(messageElement, buttonSelector, closeCallback) {
-  const inner = messageElement.querySelector('div'); // .success__inner или .error__inner
+  const inner = messageElement.querySelector('div');
   const button = messageElement.querySelector(buttonSelector);
 
-  const close = () => {
+  const onKeydown = (evt) => {
+    if (evt.key === 'Escape') {
+      evt.preventDefault();
+      close();
+    }
+  };
+
+  const onOuterClick = (evt) => {
+    if (!inner.contains(evt.target)) {
+      close();
+    }
+  };
+
+  function close() {
     messageElement.remove();
     document.removeEventListener('keydown', onKeydown);
     messageElement.removeEventListener('click', onOuterClick);
     if (closeCallback) {
       closeCallback();
     }
-  };
-
-  const onKeydown = (evt) => onEscKeydown(evt, close);
-
-  const onOuterClick = (evt) => {
-    // клик по фону, а не по inner
-    if (!inner.contains(evt.target)) {
-      close();
-    }
-  };
+  }
 
   button.addEventListener('click', (evt) => {
     evt.preventDefault();
@@ -56,7 +54,6 @@ export function showError() {
   setupMessage(errorElement, '.error__button');
 }
 
-// Опционально: отдельное сообщение про ошибку загрузки миниатюр
 export function showLoadError(message) {
   const container = document.createElement('div');
   container.style.position = 'fixed';

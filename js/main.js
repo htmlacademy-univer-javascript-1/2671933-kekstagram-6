@@ -1,4 +1,5 @@
 import './form.js';
+import { initFilters } from './filters.js';
 import { initScale } from './scale.js';
 import { initEffects } from './effects.js';
 import { renderPictures } from './pictures.js';
@@ -10,7 +11,8 @@ initEffects();
 
 load(
   (photos) => {
-    renderPictures(photos);                 // рисуем миниатюры с сервера
+    renderPictures(photos); // рисуем миниатюры с сервера
+    initFilters(photos);
     document
       .querySelector('.img-filters')
       .classList.remove('img-filters--inactive'); // показать фильтры
